@@ -1,0 +1,2307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Paperize — Professional PDF Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #F8F7F4;
+            --bg2: #EFEDE8;
+            --white: #FFFFFF;
+            --border: #E2DFD8;
+            --border-med: #C9C5BB;
+            --ink: #1A1917;
+            --ink2: #4A4845;
+            --ink3: #8C8A85;
+            --accent: #2563EB;
+            --accent-lt: #EFF4FF;
+            --accent-border: #BFCFFA;
+            --success: #16A34A;
+            --success-lt: #F0FDF4;
+            --danger: #DC2626;
+            --danger-lt: #FEF2F2;
+            --orange: #EA580C;
+            --purple: #7C3AED;
+            --teal: #0D9488;
+            --r-sm: 6px;
+            --r-md: 10px;
+            --r-lg: 14px;
+            --r-xl: 20px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.10), 0 4px 12px rgba(0, 0, 0, 0.05);
+            --transition: all 0.18s ease
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased
+        }
+
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(248, 247, 244, 0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .nav-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 32px
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0
+        }
+
+        .brand-mark {
+            width: 32px;
+            height: 32px;
+            background: var(--ink);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .brand-mark svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--white)
+        }
+
+        .brand-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.3px
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 8px
+        }
+
+        .nav-links a {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--ink2);
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: var(--r-sm);
+            transition: var(--transition)
+        }
+
+        .nav-links a:hover {
+            background: var(--bg2);
+            color: var(--ink)
+        }
+
+        .nav-right {
+            margin-left: auto
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 600;
+            border-radius: var(--r-sm);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            white-space: nowrap;
+            padding: 8px 16px
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border-color: var(--border);
+            color: var(--ink2)
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--border-med);
+            background: var(--bg2);
+            color: var(--ink)
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35)
+        }
+
+        .btn-primary:hover {
+            background: #1D4ED8
+        }
+
+        .btn-lg {
+            padding: 11px 22px;
+            font-size: 14.5px;
+            border-radius: var(--r-md)
+        }
+
+        .btn-xl {
+            padding: 13px 28px;
+            font-size: 15px;
+            border-radius: var(--r-md)
+        }
+
+        .hero {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 72px 32px 56px;
+            display: grid;
+            grid-template-columns: 1fr 480px;
+            gap: 64px;
+            align-items: center
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent-lt);
+            border: 1px solid var(--accent-border);
+            border-radius: 100px;
+            padding: 5px 14px 5px 6px;
+            margin-bottom: 24px
+        }
+
+        .eyebrow-dot {
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .eyebrow-dot svg {
+            width: 10px;
+            height: 10px;
+            fill: #fff
+        }
+
+        .hero-eyebrow span {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 0.02em
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 4vw, 52px);
+            font-weight: 700;
+            line-height: 1.08;
+            letter-spacing: -1.5px;
+            color: var(--ink);
+            margin-bottom: 20px
+        }
+
+        .hero h1 em {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-weight: 400;
+            color: var(--accent)
+        }
+
+        .hero-desc {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--ink2);
+            margin-bottom: 32px;
+            max-width: 440px
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .hero-stat {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow-sm)
+        }
+
+        .hero-stat-num {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.5px
+        }
+
+        .hero-stat-label {
+            font-size: 12px;
+            color: var(--ink3);
+            line-height: 1.3
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 10px;
+            margin-top: 28px;
+            flex-wrap: wrap
+        }
+
+        .hero-visual {
+            position: relative
+        }
+
+        .file-preview-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--r-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden
+        }
+
+        .file-preview-topbar {
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .topbar-dots {
+            display: flex;
+            gap: 6px
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%
+        }
+
+        .dot-r {
+            background: #F87171
+        }
+
+        .dot-y {
+            background: #FCD34D
+        }
+
+        .dot-g {
+            background: #6EE7B7
+        }
+
+        .topbar-pill {
+            margin-left: auto;
+            background: var(--accent-lt);
+            border: 1px solid var(--accent-border);
+            border-radius: 100px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent)
+        }
+
+        .file-preview-body {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px
+        }
+
+        .img-thumb {
+            border-radius: var(--r-md);
+            overflow: hidden;
+            aspect-ratio: 3/4;
+            position: relative;
+            border: 1px solid var(--border)
+        }
+
+        .img-thumb::after {
+            content: attr(data-n);
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.55);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Plus Jakarta Sans', sans-serif
+        }
+
+        .thumb-1 {
+            background: linear-gradient(145deg, #DBEAFE, #BFDBFE)
+        }
+
+        .thumb-2 {
+            background: linear-gradient(145deg, #D1FAE5, #A7F3D0)
+        }
+
+        .thumb-3 {
+            background: linear-gradient(145deg, #EDE9FE, #DDD6FE)
+        }
+
+        .file-preview-footer {
+            border-top: 1px solid var(--border);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .footer-info {
+            font-size: 12.5px;
+            color: var(--ink2)
+        }
+
+        .footer-info strong {
+            color: var(--ink);
+            font-weight: 600
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--bg2);
+            border-radius: 100px;
+            margin-top: 4px;
+            width: 120px
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 100px;
+            width: 75%;
+            animation: prog 2.5s ease-in-out infinite alternate
+        }
+
+        @keyframes prog {
+            from {
+                width: 20%
+            }
+
+            to {
+                width: 95%
+            }
+        }
+
+        .floating-badge {
+            position: absolute;
+            top: -16px;
+            right: -16px;
+            background: var(--success-lt);
+            border: 1px solid #BBF7D0;
+            border-radius: var(--r-md);
+            padding: 10px 14px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .floating-badge svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--success)
+        }
+
+        .floating-badge span {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--success)
+        }
+
+        .ad-wrap {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px 40px
+        }
+
+        .ad-slot {
+            background: var(--white);
+            border: 1.5px dashed var(--border-med);
+            border-radius: var(--r-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center
+        }
+
+        .ad-label {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--ink3)
+        }
+
+        .ad-inner {
+            padding: 18px 24px
+        }
+
+        .ad-inner p {
+            font-size: 12.5px;
+            color: var(--ink3);
+            line-height: 1.5
+        }
+
+        .ad-inner strong {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink2);
+            margin-bottom: 3px
+        }
+
+        .ad-lb {
+            height: 90px
+        }
+
+        .ad-rect {
+            height: 250px
+        }
+
+        .ad-half {
+            height: 130px
+        }
+
+        .main-wrap {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px 80px;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 28px;
+            align-items: start
+        }
+
+        .converter {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--r-xl);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden
+        }
+
+        .converter-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 16px
+        }
+
+        .conv-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--accent);
+            border-radius: var(--r-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0
+        }
+
+        .conv-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: #fff
+        }
+
+        .conv-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.3px
+        }
+
+        .conv-sub {
+            font-size: 13px;
+            color: var(--ink3);
+            margin-top: 2px
+        }
+
+        .converter-body {
+            padding: 28px
+        }
+
+        .dropzone {
+            border: 2px dashed #C9C5BB;
+            border-radius: var(--r-lg);
+            background: var(--bg);
+            padding: 44px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative
+        }
+
+        .dropzone:hover,
+        .dropzone.active {
+            border-color: var(--accent);
+            background: var(--accent-lt)
+        }
+
+        .dropzone input[type=file] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%
+        }
+
+        .dz-icon {
+            width: 52px;
+            height: 52px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px
+        }
+
+        .dz-icon svg {
+            width: 26px;
+            height: 26px;
+            stroke: var(--ink2);
+            fill: none;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .dropzone:hover .dz-icon,
+        .dropzone.active .dz-icon {
+            background: var(--accent-lt);
+            border-color: var(--accent-border)
+        }
+
+        .dropzone:hover .dz-icon svg,
+        .dropzone.active .dz-icon svg {
+            stroke: var(--accent)
+        }
+
+        .dz-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 6px
+        }
+
+        .dz-sub {
+            font-size: 13px;
+            color: var(--ink3);
+            line-height: 1.6
+        }
+
+        .format-tags {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 14px
+        }
+
+        .ftag {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--ink2);
+            padding: 3px 8px;
+            letter-spacing: 0.04em
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background: var(--accent-lt);
+            border: 1px solid var(--accent-border);
+            border-radius: var(--r-md);
+            margin-top: 16px
+        }
+
+        .toggle-label-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .toggle-label-wrap svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--accent);
+            fill: none;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0
+        }
+
+        .toggle-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent)
+        }
+
+        .toggle-text small {
+            display: block;
+            font-size: 11px;
+            color: var(--ink3);
+            font-weight: 400;
+            margin-top: 1px
+        }
+
+        .switch {
+            position: relative;
+            width: 36px;
+            height: 20px;
+            flex-shrink: 0
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0
+        }
+
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #C9C5BB;
+            border-radius: 100px;
+            transition: .2s
+        }
+
+        .switch-slider::before {
+            position: absolute;
+            content: '';
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: .2s
+        }
+
+        .switch input:checked+.switch-slider {
+            background: var(--accent)
+        }
+
+        .switch input:checked+.switch-slider::before {
+            transform: translateX(16px)
+        }
+
+        .settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 14px
+        }
+
+        .field label {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--ink3);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px
+        }
+
+        .field select,
+        .field input[type=text] {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            color: var(--ink);
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 500;
+            padding: 9px 12px;
+            outline: none;
+            transition: var(--transition);
+            -webkit-appearance: none
+        }
+
+        .field select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12)
+        }
+
+        .field select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238C8A85' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px
+        }
+
+        .field select:disabled {
+            opacity: 0.45;
+            cursor: not-allowed
+        }
+
+        .size-summary {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: var(--bg2);
+            border-radius: var(--r-sm);
+            border: 1px solid var(--border)
+        }
+
+        .size-summary.show {
+            display: flex
+        }
+
+        .size-summary-label {
+            font-size: 11px;
+            color: var(--ink3)
+        }
+
+        .size-tag {
+            font-size: 11px;
+            font-weight: 600;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 7px;
+            color: var(--ink2)
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 22px 0
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px
+        }
+
+        .preview-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--ink3)
+        }
+
+        .preview-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 100px;
+            margin-left: 6px
+        }
+
+        .btn-clear {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink3);
+            padding: 5px 11px;
+            cursor: pointer;
+            transition: var(--transition)
+        }
+
+        .btn-clear:hover {
+            border-color: #F87171;
+            color: var(--danger);
+            background: var(--danger-lt)
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+            gap: 10px
+        }
+
+        .prev-item {
+            position: relative;
+            border-radius: var(--r-md);
+            overflow: hidden;
+            aspect-ratio: 3/4;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            transition: var(--transition)
+        }
+
+        .prev-item:hover {
+            border-color: var(--border-med);
+            box-shadow: var(--shadow-sm)
+        }
+
+        .prev-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .prev-rm {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.55);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            opacity: 0
+        }
+
+        .prev-item:hover .prev-rm {
+            opacity: 1
+        }
+
+        .prev-rm:hover {
+            background: var(--danger)
+        }
+
+        .prev-pg {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: 700;
+            color: #fff;
+            padding: 1px 5px
+        }
+
+        .prev-sz {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: rgba(37, 99, 235, 0.8);
+            border-radius: 3px;
+            font-size: 8px;
+            font-weight: 700;
+            color: #fff;
+            padding: 1px 4px
+        }
+
+        .ad-strip {
+            margin-top: 18px
+        }
+
+        .convert-wrap {
+            margin-top: 20px
+        }
+
+        .btn-convert {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: var(--r-md);
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            cursor: pointer;
+            font-family: inherit;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+            letter-spacing: -0.2px
+        }
+
+        .btn-convert:hover:not(:disabled) {
+            background: #1D4ED8;
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+            transform: translateY(-1px)
+        }
+
+        .btn-convert:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none
+        }
+
+        .btn-convert svg {
+            width: 18px;
+            height: 18px;
+            fill: #fff
+        }
+
+        .prog-wrap {
+            display: none;
+            margin-top: 16px
+        }
+
+        .prog-wrap.on {
+            display: block
+        }
+
+        .prog-track {
+            height: 5px;
+            background: var(--bg2);
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 8px
+        }
+
+        .prog-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 100px;
+            width: 0;
+            transition: width 0.3s ease
+        }
+
+        .prog-msg {
+            font-size: 12.5px;
+            color: var(--ink3);
+            text-align: center
+        }
+
+        .success-box {
+            display: none;
+            margin-top: 16px;
+            background: var(--success-lt);
+            border: 1px solid #BBF7D0;
+            border-radius: var(--r-lg);
+            padding: 20px;
+            text-align: center
+        }
+
+        .success-box.on {
+            display: block
+        }
+
+        .success-box h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 4px
+        }
+
+        .success-box p {
+            font-size: 13px;
+            color: #166534;
+            margin-bottom: 16px
+        }
+
+        .btn-dl {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--success);
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 10px 22px;
+            border-radius: var(--r-md);
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3)
+        }
+
+        .btn-dl:hover {
+            background: #15803D
+        }
+
+        .btn-dl svg {
+            width: 16px;
+            height: 16px;
+            fill: #fff
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: sticky;
+            top: 78px
+        }
+
+        .tools-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--r-xl);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden
+        }
+
+        .tools-card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .tools-card-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--ink3)
+        }
+
+        .tools-list {
+            padding: 10px
+        }
+
+        .tool-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: var(--r-md);
+            text-decoration: none;
+            color: var(--ink);
+            transition: var(--transition);
+            cursor: pointer
+        }
+
+        .tool-row:hover {
+            background: var(--bg)
+        }
+
+        .tool-row.current {
+            background: var(--accent-lt)
+        }
+
+        .tool-ico {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--r-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0
+        }
+
+        .tool-ico svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .t-img {
+            background: #EFF4FF
+        }
+
+        .t-img svg {
+            stroke: #2563EB
+        }
+
+        .t-doc {
+            background: #F5F3FF
+        }
+
+        .t-doc svg {
+            stroke: #7C3AED
+        }
+
+        .t-pdf {
+            background: #FFF7ED
+        }
+
+        .t-pdf svg {
+            stroke: #EA580C
+        }
+
+        .t-merge {
+            background: #F0FDFA
+        }
+
+        .t-merge svg {
+            stroke: #0D9488
+        }
+
+        .t-split {
+            background: #F0FDF4
+        }
+
+        .t-split svg {
+            stroke: #16A34A
+        }
+
+        .t-comp {
+            background: #F8F7F4
+        }
+
+        .t-comp svg {
+            stroke: #6B7280
+        }
+
+        .tool-info {
+            flex: 1;
+            min-width: 0
+        }
+
+        .tool-name {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--ink)
+        }
+
+        .tool-desc {
+            font-size: 11.5px;
+            color: var(--ink3);
+            margin-top: 1px
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            padding: 2px 8px;
+            border-radius: 100px;
+            flex-shrink: 0
+        }
+
+        .badge-live {
+            background: #DCFCE7;
+            color: #15803D
+        }
+
+        .badge-soon {
+            background: var(--bg2);
+            color: var(--ink3)
+        }
+
+        .tools-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 10px
+        }
+
+        .features-wrap {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px 80px
+        }
+
+        .section-head {
+            text-align: center;
+            margin-bottom: 48px
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 12px
+        }
+
+        .section-title {
+            font-size: clamp(26px, 3vw, 36px);
+            font-weight: 700;
+            letter-spacing: -0.8px;
+            color: var(--ink);
+            line-height: 1.2
+        }
+
+        .section-title em {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-weight: 400
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px
+        }
+
+        .feat-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--r-xl);
+            padding: 28px 24px;
+            transition: var(--transition)
+        }
+
+        .feat-card:hover {
+            border-color: var(--border-med);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px)
+        }
+
+        .feat-ico {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--r-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px
+        }
+
+        .feat-ico svg {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .f-blue {
+            background: #EFF4FF
+        }
+
+        .f-blue svg {
+            stroke: #2563EB
+        }
+
+        .f-green {
+            background: #F0FDF4
+        }
+
+        .f-green svg {
+            stroke: #16A34A
+        }
+
+        .f-purple {
+            background: #F5F3FF
+        }
+
+        .f-purple svg {
+            stroke: #7C3AED
+        }
+
+        .f-orange {
+            background: #FFF7ED
+        }
+
+        .f-orange svg {
+            stroke: #EA580C
+        }
+
+        .f-teal {
+            background: #F0FDFA
+        }
+
+        .f-teal svg {
+            stroke: #0D9488
+        }
+
+        .f-gray {
+            background: #F8F7F4
+        }
+
+        .f-gray svg {
+            stroke: #6B7280
+        }
+
+        .feat-card h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 8px;
+            letter-spacing: -0.2px
+        }
+
+        .feat-card p {
+            font-size: 13.5px;
+            color: var(--ink2);
+            line-height: 1.65
+        }
+
+        .ad-mid-wrap {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px 48px
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            background: var(--white)
+        }
+
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 28px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px
+        }
+
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 16px
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .footer-brand-mark {
+            width: 26px;
+            height: 26px;
+            background: var(--ink);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .footer-brand-mark svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--white)
+        }
+
+        .footer-brand span {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--ink)
+        }
+
+        .footer-sep {
+            width: 1px;
+            height: 16px;
+            background: var(--border)
+        }
+
+        .footer-copy {
+            font-size: 12.5px;
+            color: var(--ink3)
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px
+        }
+
+        .footer-links a {
+            font-size: 12.5px;
+            color: var(--ink3);
+            text-decoration: none;
+            transition: var(--transition)
+        }
+
+        .footer-links a:hover {
+            color: var(--ink)
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            padding: 12px 18px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--ink);
+            box-shadow: var(--shadow-lg);
+            z-index: 9999;
+            display: none;
+            max-width: 300px
+        }
+
+        .toast.t-success {
+            border-color: #BBF7D0;
+            color: var(--success)
+        }
+
+        .toast.t-error {
+            border-color: #FECACA;
+            color: var(--danger)
+        }
+
+        .toast.show {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            animation: fadeUp 0.25s ease
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        @media(max-width:1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 40px
+            }
+
+            .hero-visual {
+                display: none
+            }
+
+            .main-wrap {
+                grid-template-columns: 1fr
+            }
+
+            .sidebar {
+                position: static;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+
+        @media(max-width:640px) {
+            .features-grid {
+                grid-template-columns: 1fr
+            }
+
+            .settings {
+                grid-template-columns: 1fr
+            }
+
+            .hero {
+                padding: 48px 20px 40px
+            }
+
+            .nav-links {
+                display: none
+            }
+
+            .main-wrap,
+            .ad-wrap,
+            .features-wrap,
+            .ad-mid-wrap {
+                padding-left: 20px;
+                padding-right: 20px
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="#" class="brand">
+                <div class="brand-mark"><svg viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                    </svg></div>
+                <span class="brand-name">Paperize</span>
+            </a>
+            <div class="nav-links">
+                <a href="#converter">Converter</a>
+                <a href="#tools">Tools</a>
+                <a href="#features">Features</a>
+            </div>
+            <div class="nav-right">
+                <a href="#converter" class="btn btn-primary">Start converting</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-left">
+            <div class="hero-eyebrow">
+                <div class="eyebrow-dot"><svg viewBox="0 0 24 24">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg></div>
+                <span>Free · Fast · 100% In-Browser</span>
+            </div>
+            <h1>Convert images to<br /><em>professional PDFs</em></h1>
+            <p class="hero-desc">Drop your JPG, PNG, WEBP or any image and get a perfectly formatted PDF. Auto-detects
+                the ideal paper size per image. No sign-up, no watermarks.</p>
+            <div class="hero-actions">
+                <a href="#converter" class="btn btn-primary btn-xl">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" stroke="#fff" stroke-width="2" fill="none" />
+                    </svg>
+                    Convert for free
+                </a>
+                <a href="#features" class="btn btn-ghost btn-lg">See all features</a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div>
+                        <div class="hero-stat-num">50+</div>
+                        <div class="hero-stat-label">Image formats<br />supported</div>
+                    </div>
+                </div>
+                <div class="hero-stat">
+                    <div>
+                        <div class="hero-stat-num">0KB</div>
+                        <div class="hero-stat-label">Data sent<br />to servers</div>
+                    </div>
+                </div>
+                <div class="hero-stat">
+                    <div>
+                        <div class="hero-stat-num">Auto</div>
+                        <div class="hero-stat-label">Paper size<br />detection</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="floating-badge">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6L9 17l-5-5" />
+                </svg>
+                <span>PDF ready to download</span>
+            </div>
+            <div class="file-preview-card">
+                <div class="file-preview-topbar">
+                    <div class="topbar-dots">
+                        <div class="dot dot-r"></div>
+                        <div class="dot dot-y"></div>
+                        <div class="dot dot-g"></div>
+                    </div>
+                    <div style="font-size:12.5px;font-weight:600;color:var(--ink2);margin-left:12px">Paperize — Image
+                        Converter</div>
+                    <div class="topbar-pill">3 images · auto-sized</div>
+                </div>
+                <div class="file-preview-body">
+                    <div class="img-thumb thumb-1" data-n="A4"></div>
+                    <div class="img-thumb thumb-2" data-n="A5"></div>
+                    <div class="img-thumb thumb-3" data-n="Ltr"></div>
+                </div>
+                <div class="file-preview-footer">
+                    <div class="footer-info"><strong>Converting to PDF…</strong>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div style="font-size:12px;color:var(--ink3)">Auto · Mixed sizes</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="ad-wrap">
+        <div class="ad-slot ad-lb">
+            <span class="ad-label">Advertisement</span>
+            <div class="ad-inner"><strong>Google AdSense — Leaderboard (728×90)</strong>
+                <p>Replace with your &lt;ins class="adsbygoogle"&gt; tag.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-wrap" id="converter">
+        <div class="converter">
+            <div class="converter-header">
+                <div class="conv-icon">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="8" height="8" rx="1" />
+                        <rect x="13" y="3" width="8" height="8" rx="1" />
+                        <rect x="3" y="13" width="8" height="8" rx="1" />
+                        <path d="M17 17h4m-2-2v4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="conv-title">Image to PDF Converter</div>
+                    <div class="conv-sub">JPG, PNG, WEBP, GIF, BMP · Smart auto paper size · No upload required</div>
+                </div>
+            </div>
+            <div class="converter-body">
+
+                <div class="dropzone" id="dropzone">
+                    <input type="file" id="fileInput" accept="image/*" multiple />
+                    <div class="dz-icon"><svg viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg></div>
+                    <div class="dz-title">Drop images here, or click to browse</div>
+                    <div class="dz-sub">Each image gets a perfectly fitted PDF page automatically.<br />All processing
+                        happens in your browser — nothing is uploaded.</div>
+                    <div class="format-tags"><span class="ftag">JPG</span><span class="ftag">PNG</span><span
+                            class="ftag">WEBP</span><span class="ftag">GIF</span><span class="ftag">BMP</span><span
+                            class="ftag">AVIF</span></div>
+                </div>
+
+                <!-- AUTO SIZE TOGGLE -->
+                <div class="toggle-row">
+                    <div class="toggle-label-wrap">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <div class="toggle-text">
+                            Smart auto paper size
+                            <small>Detect best-fit size per image (A4, A5, Letter, A3…)</small>
+                        </div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="autoSizeToggle" checked />
+                        <span class="switch-slider"></span>
+                    </label>
+                </div>
+
+                <!-- SIZE SUMMARY -->
+                <div class="size-summary" id="sizeSummary">
+                    <span class="size-summary-label">Detected:</span>
+                </div>
+
+                <!-- MANUAL SETTINGS -->
+                <div class="settings">
+                    <div class="field">
+                        <label>Page size</label>
+                        <select id="pageSize" disabled>
+                            <option value="A4">A4 — 210 × 297 mm</option>
+                            <option value="Letter">Letter — 8.5 × 11 in</option>
+                            <option value="A3">A3 — 297 × 420 mm</option>
+                            <option value="A5">A5 — 148 × 210 mm</option>
+                            <option value="Legal">Legal — 8.5 × 14 in</option>
+                            <option value="Exact">Exact image size</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Orientation</label>
+                        <select id="orientation" disabled>
+                            <option value="auto">Auto (per image)</option>
+                            <option value="portrait">Portrait</option>
+                            <option value="landscape">Landscape</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Image fit</label>
+                        <select id="fit">
+                            <option value="fit">Fit to page</option>
+                            <option value="fill">Fill page (crop)</option>
+                            <option value="original">Original size</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Margin</label>
+                        <select id="margin">
+                            <option value="0">No margin</option>
+                            <option value="10" selected>Small (10 pt)</option>
+                            <option value="20">Medium (20 pt)</option>
+                            <option value="40">Large (40 pt)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="previewSection" class="hidden">
+                    <div class="divider"></div>
+                    <div class="preview-header">
+                        <div>
+                            <span class="preview-label">Selected images</span>
+                            <span class="preview-count" id="imgCount">0</span>
+                        </div>
+                        <button class="btn-clear" id="clearBtn">Clear all</button>
+                    </div>
+                    <div class="preview-grid" id="previewGrid"></div>
+                </div>
+
+                <div id="adMid" class="ad-strip hidden">
+                    <div class="ad-slot ad-half"><span class="ad-label">Advertisement</span>
+                        <div class="ad-inner"><strong>Google AdSense — Banner</strong>
+                            <p>Replace with your AdSense code</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="convert-wrap">
+                    <button class="btn-convert" id="convertBtn" disabled>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" stroke="#fff" stroke-width="2" fill="none" />
+                        </svg>
+                        <span id="btnLabel">Select images to get started</span>
+                    </button>
+                </div>
+
+                <div class="prog-wrap" id="progWrap">
+                    <div class="prog-track">
+                        <div class="prog-fill" id="progFill"></div>
+                    </div>
+                    <div class="prog-msg" id="progMsg">Processing…</div>
+                </div>
+
+                <div class="success-box" id="successBox">
+                    <h4>Your PDF is ready!</h4>
+                    <p id="successDesc"></p>
+                    <a href="#" class="btn-dl" id="dlLink">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Download PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <aside class="sidebar" id="tools">
+            <div class="ad-slot ad-rect"><span class="ad-label">Advertisement</span>
+                <div class="ad-inner"><strong>Google AdSense</strong>
+                    <p>Rectangle (300×250)<br />Replace with your AdSense code</p>
+                </div>
+            </div>
+            <div class="tools-card">
+                <div class="tools-card-header"><span class="tools-card-title">All PDF tools</span><span
+                        class="badge badge-soon" style="font-size:9px">7 tools</span></div>
+                <div class="tools-list">
+                    <div class="tool-row current">
+                        <div class="tool-ico t-img"><svg viewBox="0 0 24 24">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <circle cx="8.5" cy="8.5" r="1.5" />
+                                <polyline points="21 15 16 10 5 21" />
+                            </svg></div>
+                        <div class="tool-info">
+                            <div class="tool-name">Image → PDF</div>
+                            <div class="tool-desc">JPG, PNG, WEBP & more</div>
+                        </div>
+                        <span class="badge badge-live">Live</span>
+                    </div>
+                    <div class="tools-divider"></div>
+                    <div class="tool-row">
+                        <div class="tool-ico t-doc"><svg viewBox="0 0 24 24">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                            </svg></div>
+                        <div class="tool-info">
+                            <div class="tool-name">DOCX → PDF</div>
+                            <div class="tool-desc">Word documents</div>
+                        </div>
+                        <span class="badge badge-soon">Soon</span>
+                    </div>
+                    <div class="tool-row">
+                        <div class="tool-ico t-pdf"><svg viewBox="0 0 24 24">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <path d="M9 13h6m-6 4h4" />
+                            </svg></div>
+                        <div class="tool-info">
+                            <div class="tool-name">PDF → DOCX</div>
+                            <div class="tool-desc">Editable Word file</div>
+                        </div>
+                        <span class="badge badge-soon">Soon</span>
+                    </div>
+                    <div class="tool-row">
+                        <div class="tool-ico t-pdf"><svg viewBox="0 0 24 24">
+                                <rect x="2" y="3" width="20" height="14" rx="2" />
+                                <path d="M8 21h8m-4-4v4" />
+                            </svg></div>
+                        <div class="tool-info">
+                            <div class="tool-name">PPT → PDF</div>
+                            <div class="tool-desc">PowerPoint slides</div>
+                        </div>
+                        <span class="badge badge-soon">Soon</span>
+                    </div>
+                    <div class="tools-divider"></div>
+                    <div class="tool-row">
+                        <div class="tool-ico t-merge"><svg viewBox="0 0 24 24">
+                                <path
+                                    d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                            </svg></div>
+                        <div class="tool-info">
+                            <div class="tool-name">Merge PDFs</div>
+                            <div class="tool-desc">Combine multiple files</div>
+                        </div>
+                        <span class="badge badge-soon">Soon</span>
+                    </div>
+                    <div class="tool-row">
+                        <div class="tool-ico t-split"><svg viewBox="0 0 24 24">
+                                <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l5.1 5.1M4 4l5 5" />
+                            </svg></div>
+                        <div class="tool-info">
+                            <div class="tool-name">Split PDF</div>
+                            <div class="tool-desc">Extract pages</div>
+                        </div>
+                        <span class="badge badge-soon">Soon</span>
+                    </div>
+                    <div class="tool-row">
+                        <div class="tool-ico t-comp"><svg viewBox="0 0 24 24">
+                                <polyline points="21 8 21 21 3 21 3 8" />
+                                <rect x="1" y="3" width="22" height="5" />
+                                <line x1="10" y1="12" x2="14" y2="12" />
+                            </svg></div>
+                        <div class="tool-info">
+                            <div class="tool-name">Compress PDF</div>
+                            <div class="tool-desc">Reduce file size</div>
+                        </div>
+                        <span class="badge badge-soon">Soon</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ad-slot ad-rect"><span class="ad-label">Advertisement</span>
+                <div class="ad-inner"><strong>Google AdSense</strong>
+                    <p>Rectangle (300×250)<br />Replace with your AdSense code</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <div class="ad-mid-wrap">
+        <div class="ad-slot ad-lb"><span class="ad-label">Advertisement</span>
+            <div class="ad-inner"><strong>Google AdSense — Leaderboard (728×90)</strong>
+                <p>Replace with your &lt;ins class="adsbygoogle"&gt; tag</p>
+            </div>
+        </div>
+    </div>
+
+    <section class="features-wrap" id="features">
+        <div class="section-head">
+            <div class="section-label">Why Paperize</div>
+            <div class="section-title">Everything works <em>right here</em><br />in your browser</div>
+        </div>
+        <div class="features-grid">
+            <div class="feat-card">
+                <div class="feat-ico f-blue"><svg viewBox="0 0 24 24">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#2563EB" stroke-width="1.7" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg></div>
+                <h4>Converts in seconds</h4>
+                <p>WebAssembly-powered conversion runs entirely client-side. No waiting for server round-trips — just
+                    instant PDF output.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-ico f-green"><svg viewBox="0 0 24 24">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#16A34A" />
+                    </svg></div>
+                <h4>Fully private</h4>
+                <p>Your files never touch our servers. Zero uploads, zero logs, zero tracking. Perfect for sensitive
+                    documents.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-ico f-purple"><svg viewBox="0 0 24 24">
+                        <rect x="2" y="3" width="8" height="11" rx="1" stroke="#7C3AED" />
+                        <rect x="14" y="3" width="8" height="8" rx="1" stroke="#7C3AED" />
+                        <rect x="14" y="15" width="8" height="6" rx="1" stroke="#7C3AED" />
+                    </svg></div>
+                <h4>Smart auto-sizing</h4>
+                <p>Each image's width and height are measured and matched to the nearest standard paper size — A4, A5,
+                    Letter and more — automatically.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-ico f-orange"><svg viewBox="0 0 24 24">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                            stroke="#EA580C" />
+                    </svg></div>
+                <h4>Exact image size</h4>
+                <p>Use "Exact image size" to create a PDF page that is pixel-perfect to your image dimensions — no white
+                    margins, no scaling.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-ico f-teal"><svg viewBox="0 0 24 24">
+                        <polyline points="23 4 23 10 17 10" stroke="#0D9488" />
+                        <polyline points="1 20 1 14 7 14" stroke="#0D9488" />
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+                            stroke="#0D9488" />
+                    </svg></div>
+                <h4>Batch conversion</h4>
+                <p>Select unlimited images in one go. Each gets its own perfectly sized page based on its own
+                    dimensions.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-ico f-gray"><svg viewBox="0 0 24 24">
+                        <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                            stroke="#6B7280" />
+                    </svg></div>
+                <h4>Completely free</h4>
+                <p>No account, no watermarks, no file limits. Free forever. More tools are being added — sign up to get
+                    notified.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="ad-mid-wrap">
+        <div class="ad-slot ad-lb"><span class="ad-label">Advertisement</span>
+            <div class="ad-inner"><strong>Google AdSense — Leaderboard (728×90)</strong>
+                <p>Replace with your &lt;ins class="adsbygoogle"&gt; tag</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-left">
+                <div class="footer-brand">
+                    <div class="footer-brand-mark"><svg viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                        </svg></div><span>Paperize</span>
+                </div>
+                <div class="footer-sep"></div>
+                <div class="footer-copy">© 2025 Paperize. All conversions run in your browser.</div>
+            </div>
+            <div class="footer-links"><a href="#">Privacy policy</a><a href="#">Terms of use</a><a href="#">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3868678571143228"
+        crossorigin="anonymous"></script>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+        let files = [];
+        let imageDimensions = [];
+
+        // Standard PDF page sizes in points (pt). 1mm = 2.8346pt, 1in = 72pt
+        const STD_SIZES = {
+            A3: [841.89, 1190.55],
+            A4: [595.28, 841.89],
+            A5: [419.53, 595.28],
+            A6: [297.64, 419.53],
+            Letter: [612, 792],
+            Legal: [612, 1008],
+            Tabloid: [792, 1224],
+            B5: [498.90, 708.66],
+        };
+
+        const $ = id => document.getElementById(id);
+        const dz = $('dropzone'), fi = $('fileInput'), prevSec = $('previewSection'), grid = $('previewGrid'),
+            cnt = $('imgCount'), clearBtn = $('clearBtn'), btn = $('convertBtn'), btnLbl = $('btnLabel'),
+            prog = $('progWrap'), fill = $('progFill'), msg = $('progMsg'),
+            sbox = $('successBox'), sdesc = $('successDesc'), dlLink = $('dlLink'),
+            adMid = $('adMid'), toast = $('toast'),
+            autoToggle = $('autoSizeToggle'), sizeSummary = $('sizeSummary');
+
+        // Toggle: enable/disable manual selects
+        autoToggle.addEventListener('change', () => {
+            const auto = autoToggle.checked;
+            $('pageSize').disabled = auto;
+            $('orientation').disabled = auto;
+            if (files.length) { recalcDims(); renderSizeLabels(); updateSizeSummary(); }
+        });
+
+        dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('active') });
+        dz.addEventListener('dragleave', () => dz.classList.remove('active'));
+        dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('active'); addFiles([...e.dataTransfer.files].filter(f => f.type.startsWith('image/'))) });
+        fi.addEventListener('change', () => { addFiles([...fi.files]); fi.value = '' });
+        clearBtn.addEventListener('click', () => { files = []; imageDimensions = []; render() });
+        ['pageSize', 'orientation'].forEach(id => $(id).addEventListener('change', () => { if (files.length) { recalcDims(); renderSizeLabels(); updateSizeSummary(); } }));
+
+        function addFiles(newFiles) {
+            if (!newFiles.length) { showToast('Please select image files only.', 'error'); return }
+            files.push(...newFiles);
+            render();
+        }
+
+        // Read natural pixel dimensions from an image file
+        function getImgDims(file) {
+            return new Promise(res => {
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = () => { URL.revokeObjectURL(url); res({ w: img.naturalWidth, h: img.naturalHeight }); };
+                img.onerror = () => { URL.revokeObjectURL(url); res({ w: 595, h: 842 }); };
+                img.src = url;
+            });
+        }
+
+        // Convert screen pixels → PDF points (assuming 96 DPI screen, 72pt per inch)
+        function pxToPt(px) { return px * 72 / 96; }
+
+        // Find the standard page size whose aspect ratio best matches the image
+        function bestPageSize(wPx, hPx) {
+            const isLand = wPx > hPx;
+            const ratio = isLand ? hPx / wPx : wPx / hPx; // always portrait ratio (short/long)
+
+            let bestName = 'A4', bestDiff = Infinity;
+            for (const [name, [sw, sh]] of Object.entries(STD_SIZES)) {
+                const sRatio = Math.min(sw, sh) / Math.max(sw, sh);
+                const diff = Math.abs(ratio - sRatio);
+                if (diff < bestDiff) { bestDiff = diff; bestName = name; }
+            }
+
+            const [bw, bh] = STD_SIZES[bestName];
+            let pageW, pageH;
+            if (isLand) { pageW = Math.max(bw, bh); pageH = Math.min(bw, bh); }
+            else { pageW = Math.min(bw, bh); pageH = Math.max(bw, bh); }
+            return { name: bestName, orient: isLand ? 'L' : 'P', pageW, pageH };
+        }
+
+        function manualPageSize(wPx, hPx) {
+            const psKey = $('pageSize').value;
+            const orientSel = $('orientation').value;
+
+            if (psKey === 'Exact') {
+                return { name: 'Exact', orient: wPx >= hPx ? 'L' : 'P', pageW: pxToPt(wPx), pageH: pxToPt(hPx) };
+            }
+
+            let [pw, ph] = STD_SIZES[psKey] || STD_SIZES['A4'];
+            let orient = orientSel;
+            if (orient === 'auto') orient = wPx >= hPx ? 'landscape' : 'portrait';
+            if (orient === 'landscape') { const big = Math.max(pw, ph), sml = Math.min(pw, ph); pw = big; ph = sml; }
+            else { pw = Math.min(pw, ph); ph = Math.max(pw, ph); }
+            return { name: psKey, orient: orient === 'landscape' ? 'L' : 'P', pageW: pw, pageH: ph };
+        }
+
+        function recalcDims() {
+            const auto = autoToggle.checked;
+            imageDimensions = imageDimensions.map(d => {
+                const info = auto ? bestPageSize(d.w, d.h) : manualPageSize(d.w, d.h);
+                return { ...d, ...info };
+            });
+        }
+
+        async function loadAllDimensions() {
+            imageDimensions = [];
+            const auto = autoToggle.checked;
+            for (const f of files) {
+                const { w, h } = await getImgDims(f);
+                const info = auto ? bestPageSize(w, h) : manualPageSize(w, h);
+                imageDimensions.push({ w, h, ...info });
+            }
+        }
+
+        function updateSizeSummary() {
+            if (!autoToggle.checked || !imageDimensions.length) { sizeSummary.classList.remove('show'); return; }
+            const counts = {};
+            for (const d of imageDimensions) {
+                const key = `${d.name} ${d.orient === 'L' ? 'Landscape' : 'Portrait'}`;
+                counts[key] = (counts[key] || 0) + 1;
+            }
+            sizeSummary.innerHTML = '<span class="size-summary-label">Detected:</span>' +
+                Object.entries(counts).map(([k, v]) => `<span class="size-tag">${k}${v > 1 ? ' ×' + v : ''}</span>`).join('');
+            sizeSummary.classList.add('show');
+        }
+
+        function renderSizeLabels() {
+            grid.querySelectorAll('.prev-sz').forEach((el, i) => {
+                const d = imageDimensions[i];
+                if (d) el.textContent = d.name + ' ' + d.orient;
+            });
+        }
+
+        async function render() {
+            grid.innerHTML = '';
+            cnt.textContent = files.length;
+            if (!files.length) {
+                prevSec.classList.add('hidden');
+                adMid.classList.add('hidden');
+                btn.disabled = true;
+                btnLbl.textContent = 'Select images to get started';
+                sbox.classList.remove('on');
+                prog.classList.remove('on');
+                sizeSummary.classList.remove('show');
+                return;
+            }
+            btn.disabled = false;
+            btnLbl.textContent = `Convert ${files.length} image${files.length > 1 ? 's' : ''} to PDF`;
+            prevSec.classList.remove('hidden');
+            adMid.classList.remove('hidden');
+
+            await loadAllDimensions();
+            updateSizeSummary();
+
+            files.forEach((f, i) => {
+                const url = URL.createObjectURL(f);
+                const d = imageDimensions[i] || {};
+                const el = document.createElement('div');
+                el.className = 'prev-item';
+                el.innerHTML = `<img src="${url}" onload="URL.revokeObjectURL(this.src)" loading="lazy" alt=""/>
+      <button class="prev-rm" data-i="${i}" title="Remove">✕</button>
+      <span class="prev-pg">P${i + 1}</span>
+      <span class="prev-sz">${d.name || ''} ${d.orient || ''}</span>`;
+                grid.appendChild(el);
+            });
+            grid.querySelectorAll('.prev-rm').forEach(b => b.addEventListener('click', () => {
+                const idx = +b.dataset.i;
+                files.splice(idx, 1);
+                imageDimensions.splice(idx, 1);
+                render();
+            }));
+        }
+
+        btn.addEventListener('click', async () => {
+            if (!files.length) return;
+            sbox.classList.remove('on');
+            prog.classList.add('on');
+            btn.disabled = true;
+            btnLbl.textContent = 'Converting…';
+            try {
+                const now = new Date();
+                const ts = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+                const fname = `PaperizePDF_${ts}.pdf`;
+                const fitMode = $('fit').value;
+                const marginPt = parseInt($('margin').value) || 0;
+                const pdf = await PDFDocument.create();
+
+                if (imageDimensions.length !== files.length) await loadAllDimensions();
+
+                for (let i = 0; i < files.length; i++) {
+                    setP(Math.round(i / files.length * 80), `Processing image ${i + 1} of ${files.length}…`);
+                    const ab = await readAB(files[i]);
+                    let img;
+                    try {
+                        img = files[i].type === 'image/png' ? await pdf.embedPng(ab) : await pdf.embedJpg(ab);
+                    } catch {
+                        const cv = document.createElement('canvas'), ctx = cv.getContext('2d');
+                        const bm = await createImageBitmap(files[i]);
+                        cv.width = bm.width; cv.height = bm.height; ctx.drawImage(bm, 0, 0);
+                        const bl = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.92));
+                        img = await pdf.embedJpg(await bl.arrayBuffer());
+                    }
+
+                    const d = imageDimensions[i];
+                    const pw = d.pageW, ph = d.pageH;
+                    const page = pdf.addPage([pw, ph]);
+                    const { width: iw, height: ih } = img;
+                    const aw = pw - marginPt * 2;
+                    const ah = ph - marginPt * 2;
+                    let x, y, dw, dh;
+
+                    if (fitMode === 'fill') {
+                        const s = Math.max(aw / iw, ah / ih);
+                        dw = iw * s; dh = ih * s;
+                        x = (pw - dw) / 2; y = (ph - dh) / 2;
+                    } else if (fitMode === 'original') {
+                        dw = iw; dh = ih;
+                        x = (pw - dw) / 2; y = (ph - dh) / 2;
+                    } else {
+                        const s = Math.min(aw / iw, ah / ih);
+                        dw = iw * s; dh = ih * s;
+                        x = marginPt + (aw - dw) / 2;
+                        y = marginPt + (ah - dh) / 2;
+                    }
+                    page.drawImage(img, { x, y, width: dw, height: dh });
+                }
+
+                setP(90, 'Building PDF…');
+                const bytes = await pdf.save();
+                setP(100, 'Done!');
+                const blob = new Blob([bytes], { type: 'application/pdf' });
+                dlLink.href = URL.createObjectURL(blob);
+                dlLink.download = fname;
+
+                const uniqueSizes = [...new Set(imageDimensions.map(d => d.name))];
+                const sizeNote = autoToggle.checked
+                    ? ` · Auto-sized (${uniqueSizes.join(', ')})`
+                    : ` · ${$('pageSize').value}`;
+                sdesc.textContent = `${files.length} image${files.length > 1 ? 's' : ''} converted · ${fmtBytes(bytes.byteLength)}${sizeNote}`;
+                sbox.classList.add('on');
+                showToast('PDF ready — click download below!', 'success');
+            } catch (e) {
+                console.error(e);
+                showToast('Conversion error: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btnLbl.textContent = `Convert ${files.length} image${files.length > 1 ? 's' : ''} to PDF`;
+                setTimeout(() => prog.classList.remove('on'), 1500);
+            }
+        });
+
+        function readAB(f) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsArrayBuffer(f) }) }
+        function setP(pct, m) { fill.style.width = pct + '%'; msg.textContent = m }
+        function fmtBytes(b) { return b < 1048576 ? (b / 1024).toFixed(1) + ' KB' : (b / 1048576).toFixed(2) + ' MB' }
+        function showToast(m, t = 'success') { toast.textContent = m; toast.className = `toast t-${t} show`; setTimeout(() => toast.className = 'toast', 3800) }
+    </script>
+</body>
+
+</html>
